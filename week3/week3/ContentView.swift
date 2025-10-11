@@ -44,6 +44,10 @@ struct ContentView: View {
                         .fontWeight(.bold)
                     TextField("Enter Length", text: $length)
                         .textFieldStyle(.roundedBorder)
+                        .onChange(of: length, {oldValue, newValue in
+                                resultText = ""
+                                errorText = ""
+                        })
                 }.padding()
                 HStack{
                     Text("Depth: ")
@@ -51,6 +55,11 @@ struct ContentView: View {
                         .fontWeight(.bold)
                     TextField("Enter Depth", text: $depth)
                         .textFieldStyle(.roundedBorder)
+                        .onChange(of: depth, {oldValue, newValue in
+                                resultText = ""
+                                errorText = ""
+                        })
+
                 }.padding()
                 HStack{
                     Text("Width: ")
@@ -58,6 +67,10 @@ struct ContentView: View {
                         .fontWeight(.bold)
                     TextField("Enter Width", text: $width)
                         .textFieldStyle(.roundedBorder)
+                        .onChange(of: width, {oldValue, newValue in
+                                resultText = ""
+                                errorText = ""
+                        })
                 }.padding()
             }
             
