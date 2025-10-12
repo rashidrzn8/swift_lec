@@ -87,18 +87,20 @@ struct ContentView: View {
                 }
 
                 let volumeCharge = lengthValue * depthValue * widthValue
-                let cost = (volumeCharge / 1000 * 0.10) + (weightCharge * 0.50)
-                if cost < 4 {
+                var totalCost = 3.00
+                totalCost += weightCharge * 0.50
+                totalCost += (volumeCharge / 1000 * 0.10)
+                if totalCost < 4 {
                     resultText = "⚠️ Minimum cost should be Rs 4.00"
                 } else {
-                    resultText = "💰 The cost is: Rs \(String(format: "%.2f", cost))"
+                    resultText = "💰 The cost is: Rs \(String(format: "%.2f", totalCost))"
                 }
 
                 errorText = ""
             }
             .buttonStyle(.borderedProminent)
             .buttonBorderShape(.capsule)
-            .tint(.purple)
+            .tint(isDisable ? .gray : .blue )
            .disabled(isDisable)
             VStack{
                 Text(resultText)
