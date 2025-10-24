@@ -1,118 +1,137 @@
-//
-//  ContentView.swift
-//  week3
-//
-//  Created by Rashid Ahamed on 11/10/25.
-//
-
 import SwiftUI
 
 struct ContentView: View {
-    @State private var weight:String = ""
-    @State private var length:String = ""
-    @State private var depth:String = ""
-    @State private var width:String = ""
-    @State private var resultText:String = ""
-    @State private var errorText:String = ""
-    var isDisable:Bool  {
-      return weight.isEmpty || length.isEmpty || depth.isEmpty || width.isEmpty
+    @State private var weight: String = ""
+    @State private var length: String = ""
+    @State private var depth: String = ""
+    @State private var width: String = ""
+    @State private var resultText: String = ""
+    @State private var errorText: String = ""
+    @State private var advancedSettings: Bool = false
+    
+    var isDisabled: Bool {
+        weight.isEmpty || length.isEmpty || depth.isEmpty || width.isEmpty
     }
     
     var body: some View {
         VStack {
             Text("Parcel Cost Calculator")
-                .font(.system(size: 30))
-                .fontWeight(.bold)
-                .padding()
-            HStack{
-                Text("Weight: ")
-                    .font(.system(size: 20))
-                    .fontWeight(.bold)
-                TextField("Enter weight", text: $weight)
-                    .font(.system(size: 20))
-                    .textFieldStyle(.roundedBorder)
-                    .keyboardType(.decimalPad)
-                    .onChange(of: weight, {oldValue, newValue in
-                            resultText = ""
-                            errorText = ""
-                    })
-            }.padding()
-            VStack{
-                HStack{
-                    Text("Length: ")
-                        .font(.system(size: 20))
-                        .fontWeight(.bold)
-                    TextField("Enter Length", text: $length)
-                        .textFieldStyle(.roundedBorder)
-                        .onChange(of: length, {oldValue, newValue in
-                                resultText = ""
-                                errorText = ""
-                        })
-                }.padding()
-                HStack{
-                    Text("Depth: ")
-                        .font(.system(size: 20))
-                        .fontWeight(.bold)
-                    TextField("Enter Depth", text: $depth)
-                        .textFieldStyle(.roundedBorder)
-                        .onChange(of: depth, {oldValue, newValue in
-                                resultText = ""
-                                errorText = ""
-                        })
-
-                }.padding()
-                HStack{
-                    Text("Width: ")
-                        .font(.system(size: 20))
-                        .fontWeight(.bold)
-                    TextField("Enter Width", text: $width)
-                        .textFieldStyle(.roundedBorder)
-                        .onChange(of: width, {oldValue, newValue in
-                                resultText = ""
-                                errorText = ""
-                        })
-                }.padding()
+                .font(.system(size: 28, weight: .bold))
+                .padding(.top)
+            
+            Toggle("Use Advanced Pricing", isOn: $advancedSettings)
+                .padding(.horizontal)
+                .toggleStyle(SwitchToggleStyle(tint: .green))
+            
+            Group {
+                InputField(label: "Weight (kg)", value: $weight)
+                InputField(label: "Length (cm)", value: $length)
+                InputField(label: "Depth (cm)", value: $depth)
+                InputField(label: "Width (cm)", value: $width)
             }
             
             Button("Calculate Cost") {
-                guard
-                    let weightCharge = Double(weight),
-                    let lengthValue = Double(length),
-                    let depthValue = Double(depth),
-                    let widthValue = Double(width)
-                else {
-                    errorText = "⚠️ Please enter valid numbers for all fields"
-                    resultText = ""
-                    return
-                }
-
-                let volumeCharge = lengthValue * depthValue * widthValue
-                var totalCost = 3.00
-                totalCost += weightCharge * 0.50
-                totalCost += (volumeCharge / 1000 * 0.10)
-                if totalCost < 4 {
-                    resultText = "⚠️ Minimum cost should be Rs 4.00"
-                } else {
-                    resultText = "💰 The cost is: Rs \(String(format: "%.2f", totalCost))"
-                }
-
-                errorText = ""
+                calculateParcelCost()
             }
             .buttonStyle(.borderedProminent)
             .buttonBorderShape(.capsule)
-            .tint(isDisable ? .gray : .blue )
-           .disabled(isDisable)
-            VStack{
-                Text(resultText)
-                    .foregroundStyle(.green)
-                    .font(.system(size: 16))
-                Text(errorText)
-                    .foregroundStyle(.red)
-                    .font(.system(size: 16))
+            .tint(isDisabled ? .gray : .blue)
+            .disabled(isDisabled)
+            .padding(.top)
+            
+            VStack(spacing: 8) {
+                if !resultText.isEmpty {
+                    Text(resultText)
+                        .foregroundStyle(.green)
+                        .font(.system(size: 16))
+                }
+                if !errorText.isEmpty {
+                    Text(errorText)
+                        .foregroundStyle(.red)
+                        .font(.system(size: 16))
+                }
             }
+            .padding(.top, 10)
+            
+            Spacer()
         }
         .padding()
-        Spacer()
+    }
+    
+    func calculateParcelCost() {
+        guard
+            let weightVal = Double(weight),
+            let lengthVal = Double(length),
+            let depthVal = Double(depth),
+            let widthVal = Double(width)
+        else {
+            errorText = "⚠️ Please enter valid numbers for all fields"
+            resultText = ""
+            return
+        }
+        
+        if advancedSettings {
+            // Advanced Validation
+            guard weightVal <= 30 else {
+                errorText = "⚠️ Weight should not exceed 30 kg"
+                resultText = ""
+                return
+            }
+            guard lengthVal <= 150, depthVal <= 150, widthVal <= 150 else {
+                errorText = "⚠️ Dimensions should not exceed 150 cm"
+                resultText = ""
+                return
+            }
+            
+            let cost = calculateCostAdvanced(weight: weightVal, length: lengthVal, depth: depthVal, width: widthVal)
+            resultText = cost < 5 ? "⚠️ Minimum cost should be Rs 5.00" : "💰 The cost is: Rs \(String(format: "%.2f", cost))"
+            errorText = ""
+        } else {
+            // Standard Calculation
+            let cost = calculateCost(weight: weightVal, length: lengthVal, depth: depthVal, width: widthVal)
+            resultText = cost < 4 ? "⚠️ Minimum cost should be Rs 4.00" : "💰 The cost is: Rs \(String(format: "%.2f", cost))"
+            errorText = ""
+        }
+    }
+    
+    func calculateCost(weight: Double, length: Double, depth: Double, width: Double) -> Double {
+        let volume = length * depth * width
+        var totalCost = 3.0
+        totalCost += weight * 0.5
+        totalCost += (volume / 1000 * 0.1)
+        return totalCost
+    }
+    
+    func calculateCostAdvanced(weight: Double, length: Double, depth: Double, width: Double) -> Double {
+        let volume = length * depth * width
+        var totalCost = 2.5
+        totalCost += weight * 1.5
+        totalCost += (volume / 1000 * 0.75)
+        
+        if weight > 20 {
+            totalCost *= 1.5
+        } else if weight > 10 {
+            totalCost *= 1.25
+        }
+        return totalCost
+    }
+}
+
+struct InputField: View {
+    let label: String
+    @Binding var value: String
+    
+    var body: some View {
+        HStack {
+            Text("\(label):")
+                .font(.system(size: 18, weight: .semibold))
+            TextField("Enter \(label.lowercased())", text: $value)
+                .textFieldStyle(.roundedBorder)
+                .keyboardType(.decimalPad)
+                .onChange(of: value) { _, _ in }
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 4)
     }
 }
 
