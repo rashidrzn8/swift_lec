@@ -12,5 +12,31 @@ enum APIConfigError: Error, LocalizedError{
     case dataLoadingError(underlyingError:Error)
     case decodingError(underlyingError:Error)
     
-     
+    var errorDescription: String? {
+        switch self {
+        case .fileNotFound:
+            return "File not found"
+        case .dataLoadingError(underlyingError: let error):
+            return "Data loading error: \(error.localizedDescription)"
+        case .decodingError(underlyingError: let error):
+            return "Decoding error: \(error.localizedDescription)"
+        }
+    }
+    
+    
+}
+
+
+enum NetworkError:Error, LocalizedError{
+    case badURL(CTUnderlineStyle : Error)
+    case missingConfiguration
+    
+    var errorDescription: String? {
+        switch self {
+        case  .badURL(CTUnderlineStyle: let error):
+            return "Bad URL: \(error.localizedDescription)"
+        case .missingConfiguration:
+            return "Missing configuration"
+        }
+    }
 }

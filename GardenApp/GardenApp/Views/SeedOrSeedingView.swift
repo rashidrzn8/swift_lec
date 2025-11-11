@@ -1,18 +1,18 @@
 //
-//  Details.swift
-//  FilmsApp
+//  SeedOrSeedingView.swift
+//  GardenApp
 //
-//  Created by Rashid Ahamed on 1/11/25.
+//  Created by Rashid Ahamed on 10/11/25.
 //
 
 import SwiftUI
 
-struct Details: View {
+struct SeedOrSeedingView: View {
     var body: some View {
         Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
     }
 }
 
 #Preview {
-    Details()
+    SeedOrSeedingView()
 }
