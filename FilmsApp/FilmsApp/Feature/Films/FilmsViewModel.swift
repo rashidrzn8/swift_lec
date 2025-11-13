@@ -23,7 +23,7 @@ class FilmsViewModel{
         do{
             let films = try await service.fetchFilms()
             state = .loaded(films)
-        }catch let error as ApiError {
+        }catch let error as APIError {
             self.state = .error(error.errorDescription ?? "unknown error")
         }catch{
             self.state = .error("unknown error")

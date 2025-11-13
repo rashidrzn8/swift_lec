@@ -23,11 +23,21 @@ struct ContentView: View {
             Tab("Favorites", systemImage: "heart") {
                 FavoritesScreen(filmsViewModel: filmsViewModel, favoritesViewModel: favoritesViewModel)
             }
+            
+            Tab("Settings", systemImage: "gear") {
+                SettingsView()
+            }
+            
+            Tab("Search", systemImage: "magnifyingglass") {
+                
+            }
+            
         }
         .task {
             favoritesViewModel.configure(modelContext: modelContext)
             await filmsViewModel.fetch()
         }
+        .setAppearenceTheme()
     }
 }
 
